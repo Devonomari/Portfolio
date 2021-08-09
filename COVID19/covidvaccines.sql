@@ -1,3 +1,4 @@
+--Query to determine the percentage of population vaccinated in various countries
 SELECT cv.continent,MAX(cd.population) Population,cv.location, MAX(cv.people_fully_vaccinated) fulled_vaxed, 
 	ROUND(MAX(cv.people_fully_vaccinated::numeric)/MAX(cd.population) *100,3) as percent_vaxed
 FROM covidvaccinations cv
