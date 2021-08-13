@@ -1,4 +1,4 @@
-/*Given two tables as below, write a query to display the comparison result (higher/lower/same) of the 
+/*Problem: Given two tables as below, write a query to display the comparison result (higher/lower/same) of the 
   average salary of employees in a department for the month to the company's average salary for the month.
 
   Table: salary
@@ -29,6 +29,7 @@ So for the sample data above, the result is:
 
 
 --SOLUTION:
+-- Obtain monthly average from company regardless of department
 WITH monthly_average AS (
 
     SELECT   DATE_FORMAT(s.pay_date,'%Y-%m') month, AVG(amount) company_average
@@ -36,10 +37,12 @@ WITH monthly_average AS (
     GROUP BY DATE_FORMAT(s.pay_date,'%Y-%m') 
 
 ),
-
+-- Join salaries table with departments on employees, and join the company monthly averages query above with the dates from salaries table.
+-- Group by (department, date) to get department averages per month
 average_compare AS (
     
-SELECT   e.department_id AS department_id, DATE_FORMAT(s.pay_date,'%Y-%m')  pay_month,                    AVG(s.amount) AS dept_avg, monthly_average.company_average month_avg
+SELECT   e.department_id AS department_id, DATE_FORMAT(s.pay_date,'%Y-%m')  pay_month, 
+         AVG(s.amount) AS dept_avg, monthly_average.company_average month_avg
 FROM     salary s
 JOIN     employee e
       ON s.employee_id = e.employee_id
@@ -48,7 +51,7 @@ JOIN     monthly_average
 GROUP BY e.department_id, monthly_average.company_average,  DATE_FORMAT(s.pay_date,'%Y-%m') 
 
 )
-
+-- Case statement to create desired output table
 SELECT pay_month, department_id, 
     (CASE 
         WHEN dept_avg > month_avg THEN 'higher'
